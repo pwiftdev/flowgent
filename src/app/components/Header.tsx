@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 export default function Header() {
   const [activeSection, setActiveSection] = useState('');
@@ -33,16 +34,28 @@ export default function Header() {
     <header className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-foreground/10">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center">
-          <div className="relative w-32 h-6">
-            <Image
-              src="/logo.png"
-              alt="FLOWGENT Logo"
-              width={128}
-              height={24}
-              className="object-contain"
-              priority
-            />
-          </div>
+          <motion.div 
+            className="relative w-48 h-12 flex items-center justify-center"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+          >
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl scale-0 group-hover:scale-110 transition-transform duration-300" />
+            
+            {/* Logo */}
+            <div className="relative w-full h-full">
+              <Image
+                src="/logo.png"
+                alt="FLOWGENT Logo"
+                width={192}
+                height={48}
+                className="object-contain w-full h-full"
+                priority
+              />
+            </div>
+          </motion.div>
         </Link>
         
         <nav className="hidden md:flex items-center gap-8">
