@@ -1,0 +1,23 @@
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px var(--accent), 0 0 10px var(--accent);
+  }
+  to {
+    box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
+  }
+}
+
+.connectingLine {
+  height: 100%;
+  background: var(--accent);
+  transition: opacity 1000ms;
+}
+
+.connectingLine.visible {
+  opacity: 1;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.connectingLine.hidden {
+  opacity: 0;
+} 
