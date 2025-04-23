@@ -358,7 +358,7 @@ export default function Hero() {
         }, 1000);
       }
     }
-  }, [text1, text2, currentLine]);
+  }, [text1, text2, currentLine, typingText]);
 
   return (
     <>

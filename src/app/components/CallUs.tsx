@@ -27,7 +27,7 @@ const CallUsContent = () => {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Transform Your Business?</h2>
             <p className="text-lg text-purple-100">
-              Let's discuss how our AI solutions can help you achieve your goals.
+              Let&apos;s discuss how our AI solutions can help you achieve your goals.
             </p>
           </motion.div>
 

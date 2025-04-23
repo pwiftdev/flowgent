@@ -20,7 +20,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
       </head>
-      <body className={jetbrainsMono.className} overflow-x-hidden>
+      <body className={`${jetbrainsMono.className} overflow-x-hidden`}>
         <Providers>
           {children}
         </Providers>
