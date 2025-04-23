@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function Header() {
@@ -31,8 +32,17 @@ export default function Header() {
   return (
     <header className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-foreground/10">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold tracking-tighter text-glow">
-          FLOWGENT
+        <Link href="/" className="flex items-center">
+          <div className="relative w-32 h-6">
+            <Image
+              src="/logo.png"
+              alt="FLOWGENT Logo"
+              width={128}
+              height={24}
+              className="object-contain"
+              priority
+            />
+          </div>
         </Link>
         
         <nav className="hidden md:flex items-center gap-8">
