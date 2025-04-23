@@ -162,10 +162,10 @@ export default function HowItWorks() {
       {/* Main content with gradient overlays */}
       <div className="relative w-full bg-black">
         {/* Top gradient that extends down */}
-        <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-[#001106] via-[#001106]/50 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-[#001106] via-[#001106]/50 to-transparent pointer-events-none z-10" />
         
         {/* Bottom gradient that extends up */}
-        <div className="absolute inset-x-0 bottom-0 h-[600px] bg-gradient-to-t from-[#001106] via-[#001106]/50 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-[600px] bg-gradient-to-t from-[#001106] via-[#001106]/50 to-transparent pointer-events-none z-10" />
         
         <GlowingElements />
         
@@ -194,7 +194,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Steps container */}
-        <div className="relative h-[500vh]">
+        <div className="relative" style={{ height: `${(steps.length + 1) * 100}vh` }}>
           {steps.map((step, index) => (
             <StepSection
               key={index}
@@ -227,55 +227,41 @@ function StepSection({ step, index, progress, total }: StepProps) {
   const isInView = useInView(sectionRef, { amount: 0.5 });
 
   // Calculate the progress range for this step
-  const startProgress = 0.15 + (index * 0.85) / total;
-  const midProgress = startProgress + (0.85 / total) * 0.5;
-  const endProgress = startProgress + 0.85 / total;
+  const stepStart = (index + 1) * (1 / (total + 1));
+  const stepEnd = (index + 2) * (1 / (total + 1));
 
-  // Adjusted ranges for full viewport transitions
+  // Opacity animation
   const opacity = useTransform(
     progress,
     [
-      startProgress - 0.05,         // Start fade in
-      startProgress,                // Fully visible
-      endProgress - 0.05,          // Start fade out
-      endProgress                   // Complete fade out
+      stepStart - 0.1,      // Start fade in
+      stepStart,           // Fully visible
+      stepEnd - 0.1,      // Start fade out
+      stepEnd             // Fully faded out
     ],
     [0, 1, 1, 0]
   );
 
+  // Y position animation for smooth transitions
   const y = useTransform(
     progress,
     [
-      startProgress - 0.05,
-      startProgress,
-      endProgress - 0.05,
-      endProgress
+      stepStart - 0.1,
+      stepStart,
+      stepEnd - 0.1,
+      stepEnd
     ],
-    ["50px", "0px", "0px", "-50px"]
-  );
-
-  // Calculate z-index based on progress
-  const zIndex = useTransform(
-    progress,
-    [startProgress - 0.1, startProgress, endProgress - 0.1, endProgress],
-    [0, 2, 2, 0]
-  );
-
-  // Calculate visibility to completely hide elements when not in view
-  const visibility = useTransform(
-    progress,
-    [startProgress - 0.1, startProgress - 0.05, endProgress, endProgress + 0.05],
-    ["hidden", "visible", "visible", "hidden"]
+    ["20vh", "0vh", "0vh", "-20vh"]
   );
 
   return (
     <motion.div
       ref={sectionRef}
-      className="sticky top-0 h-screen w-full flex items-center justify-center"
+      className="fixed top-0 left-0 w-full h-screen flex items-center justify-center"
       style={{ 
         opacity,
-        zIndex,
-        visibility,
+        y,
+        pointerEvents: "none"
       }}
     >
       {/* Background gradient */}
@@ -283,39 +269,26 @@ function StepSection({ step, index, progress, total }: StepProps) {
       
       <motion.div
         className="relative z-10 max-w-4xl mx-auto px-4 text-center"
-        style={{ y }}
       >
         <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={isInView ? { scale: 1, opacity: 1 } : { scale: 0.5, opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-8 text-emerald-400"
         >
           {step.icon}
         </motion.div>
 
         <motion.h3
-          initial={{ y: 20, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
           className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-600"
         >
           {step.title}
         </motion.h3>
 
         <motion.p
-          initial={{ y: 20, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
           className="text-xl text-gray-300 max-w-2xl mx-auto"
         >
           {step.description}
         </motion.p>
 
         <motion.div
-          initial={{ scale: 0 }}
-          animate={isInView ? { scale: 1 } : { scale: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-8 text-sm text-emerald-500"
         >
           Step {index + 1} of {total}
@@ -323,4 +296,4 @@ function StepSection({ step, index, progress, total }: StepProps) {
       </motion.div>
     </motion.div>
   );
-} 
+}
