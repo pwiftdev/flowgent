@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { StreamingTextResponse } from 'ai';
+import { AnthropicStream, StreamingTextResponse } from 'ai';
 
 export const runtime = "edge";
 
@@ -17,5 +17,6 @@ export async function POST(req: Request) {
     max_tokens: 1024,
   });
 
-  return new StreamingTextResponse(response);
+  const stream = AnthropicStream(response);
+  return new StreamingTextResponse(stream);
 }
