@@ -186,8 +186,8 @@ export default function Hero() {
   const [isTypingComplete, setIsTypingComplete] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
+  const [typingText, setTypingText] = useState(['WE AUTOMATE,', 'YOU ACCELERATE.']);
 
-  const typingText = ['WE AUTOMATE,', 'YOU ACCELERATE.'];
   const finalText = [
     'TRANSFORMING',
     'CUSTOMER SERVICE',
@@ -201,6 +201,16 @@ export default function Hero() {
 
     return () => clearInterval(cursorInterval);
   }, []);
+
+  useEffect(() => {
+    if (currentLine < text.length) {
+      const timeout = setTimeout(() => {
+        setTypingText(prev => [...prev, text[currentLine]]);
+        setCurrentLine(prev => prev + 1);
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [text, currentLine]);
 
   useEffect(() => {
     if (currentLine >= typingText.length) {
