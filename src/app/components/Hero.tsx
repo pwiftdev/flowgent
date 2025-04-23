@@ -181,13 +181,14 @@ const SpinningShapes = () => (
 );
 
 export default function Hero() {
-  const [text, setText] = useState('');
-  const [currentLine, setCurrentLine] = useState(0);
+  const [text1, setText1] = useState('');
+  const [text2, setText2] = useState('');
   const [isTypingComplete, setIsTypingComplete] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
-  const [typingText, setTypingText] = useState(['WE AUTOMATE,', 'YOU ACCELERATE.']);
+  const [currentLine, setCurrentLine] = useState(0);
 
+  const typingText = ['WE AUTOMATE,', 'YOU ACCELERATE.'];
   const finalText = [
     'TRANSFORMING',
     'CUSTOMER SERVICE',
@@ -203,38 +204,29 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    if (currentLine < text.length) {
-      const timeout = setTimeout(() => {
-        setTypingText(prev => [...prev, text[currentLine]]);
-        setCurrentLine(prev => prev + 1);
-      }, 100);
-      return () => clearTimeout(timeout);
+    if (currentLine === 0) {
+      if (text1.length < typingText[0].length) {
+        const timeout = setTimeout(() => {
+          setText1(typingText[0].slice(0, text1.length + 1));
+        }, 100);
+        return () => clearTimeout(timeout);
+      } else {
+        setCurrentLine(1);
+      }
+    } else if (currentLine === 1) {
+      if (text2.length < typingText[1].length) {
+        const timeout = setTimeout(() => {
+          setText2(typingText[1].slice(0, text2.length + 1));
+        }, 100);
+        return () => clearTimeout(timeout);
+      } else {
+        setIsTypingComplete(true);
+        setTimeout(() => {
+          setIsOverlayVisible(false);
+        }, 1000);
+      }
     }
-  }, [text, currentLine]);
-
-  useEffect(() => {
-    if (currentLine >= typingText.length) {
-      setIsTypingComplete(true);
-      setTimeout(() => {
-        setIsOverlayVisible(false);
-      }, 1000);
-      return;
-    }
-
-    const currentTextLine = typingText[currentLine];
-    if (text.length < currentTextLine.length) {
-      const timeout = setTimeout(() => {
-        setText(prev => currentTextLine.slice(0, prev.length + 1));
-      }, 50);
-      return () => clearTimeout(timeout);
-    } else {
-      const timeout = setTimeout(() => {
-        setText('');
-        setCurrentLine(prev => prev + 1);
-      }, 200);
-      return () => clearTimeout(timeout);
-    }
-  }, [text, currentLine, typingText]);
+  }, [text1, text2, currentLine]);
 
   return (
     <>
@@ -260,123 +252,20 @@ export default function Hero() {
 
         {/* Centered typing animation */}
         <div className="relative text-4xl md:text-7xl font-bold tracking-tighter text-center z-10">
-          {typingText.map((line, index) => (
-            <div key={line} className="h-[1.2em] flex items-center justify-center">
-              <span className="text-glow">
-                {index < currentLine ? line : index === currentLine ? text : ''}
-              </span>
-              {index === currentLine && !isTypingComplete && showCursor && (
+          <div className="space-y-4">
+            <div className="h-[1.2em] flex items-center justify-center">
+              <span className="text-glow">{text1}</span>
+              {currentLine === 0 && showCursor && (
                 <span className="text-glow ml-1 animate-pulse">_</span>
               )}
             </div>
-          ))}
-
-          {/* Accelerating circle animation */}
-          <motion.div 
-            className="relative h-32 mt-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: currentLine >= typingText.length ? 1 : 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <motion.div
-              className="absolute left-1/2 top-1/2 w-16 h-16 border-2 border-emerald-500/50 rounded-full"
-              style={{ 
-                filter: 'blur(1px)',
-                transformOrigin: 'center',
-                x: '-50%',
-                y: '-50%'
-              }}
-              animate={{
-                rotate: [0, 1080],
-                scale: [1, 0.8, 1],
-              }}
-              transition={{
-                rotate: {
-                  duration: 3,
-                  ease: [0.4, 0, 0.2, 1], // Custom easing for acceleration
-                  repeat: Infinity,
-                  repeatType: "loop",
-                },
-                scale: {
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                }
-              }}
-            />
-            
-            {/* Trail effect */}
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute left-1/2 top-1/2 w-16 h-16 border border-emerald-500/30 rounded-full"
-                style={{ 
-                  filter: 'blur(1px)',
-                  transformOrigin: 'center',
-                  x: '-50%',
-                  y: '-50%'
-                }}
-                animate={{
-                  rotate: [0, 1080],
-                  scale: [1, 0.8, 1],
-                  opacity: [0.3, 0, 0.3]
-                }}
-                transition={{
-                  rotate: {
-                    duration: 3,
-                    ease: [0.4, 0, 0.2, 1],
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    delay: i * 0.2
-                  },
-                  scale: {
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    delay: i * 0.2
-                  },
-                  opacity: {
-                    duration: 1,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    delay: i * 0.2
-                  }
-                }}
-              />
-            ))}
-
-            {/* Particle effects */}
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={`particle-${i}`}
-                className="absolute left-1/2 top-1/2 w-2 h-2 bg-emerald-500/30 rounded-full"
-                style={{ 
-                  filter: 'blur(0.5px)',
-                }}
-                animate={{
-                  x: [
-                    '-50%',
-                    `${Math.cos(i * Math.PI / 3) * 100}%`,
-                    '-50%'
-                  ],
-                  y: [
-                    '-50%',
-                    `${Math.sin(i * Math.PI / 3) * 100}%`,
-                    '-50%'
-                  ],
-                  scale: [0, 1, 0],
-                  opacity: [0, 0.5, 0]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  ease: "easeInOut",
-                  delay: i * 0.3
-                }}
-              />
-            ))}
-          </motion.div>
+            <div className="h-[1.2em] flex items-center justify-center">
+              <span className="text-glow">{text2}</span>
+              {currentLine === 1 && !isTypingComplete && showCursor && (
+                <span className="text-glow ml-1 animate-pulse">_</span>
+              )}
+            </div>
+          </div>
         </div>
       </motion.div>
 
@@ -391,7 +280,7 @@ export default function Hero() {
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               <div className="text-4xl md:text-6xl font-bold leading-tight tracking-tighter">
-                {finalText.map((line, index) => (
+                {finalText.map((line: string, index: number) => (
                   <div key={line} className="h-[1.2em] flex items-center">
                     <span className="text-glow">{line}</span>
                   </div>

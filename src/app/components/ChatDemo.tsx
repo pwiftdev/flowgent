@@ -26,26 +26,48 @@ const messages = [
   }
 ];
 
+// Create a separate component for the message
+function ChatMessage({ message, index, scrollYProgress }: { 
+  message: { role: string; content: string }; 
+  index: number; 
+  scrollYProgress: any;
+}) {
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.1 + index * 0.1, 0.2 + index * 0.1, 0.4 + index * 0.1, 0.8],
+    [0, 0, 1, 1, 0]
+  );
+  
+  const x = useTransform(
+    scrollYProgress,
+    [0, 0.1 + index * 0.1, 0.2 + index * 0.1, 0.4 + index * 0.1, 0.8],
+    [message.role === 'user' ? 50 : -50, message.role === 'user' ? 0 : 0, message.role === 'user' ? 0 : 0, message.role === 'user' ? 0 : 0, message.role === 'user' ? 0 : 0]
+  );
+
+  return (
+    <motion.div
+      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+      style={{ opacity, x }}
+    >
+      <div 
+        className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+          message.role === 'user' 
+            ? 'bg-accent text-background ml-4'
+            : 'bg-foreground/10 backdrop-blur-sm mr-4'
+        }`}
+      >
+        <p className="whitespace-pre-wrap">{message.content}</p>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function ChatDemo() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
   });
-
-  // Create transform values for each message
-  const messageTransforms = messages.map((_, index) => ({
-    opacity: useTransform(
-      scrollYProgress,
-      [0, 0.1 + index * 0.1, 0.2 + index * 0.1, 0.4 + index * 0.1, 0.8],
-      [0, 0, 1, 1, 0]
-    ),
-    x: useTransform(
-      scrollYProgress,
-      [0, 0.1 + index * 0.1, 0.2 + index * 0.1, 0.4 + index * 0.1, 0.8],
-      [messages[index].role === 'user' ? 50 : -50, 0]
-    )
-  }));
 
   return (
     <section className="relative py-32 overflow-hidden" ref={containerRef}>
@@ -63,24 +85,12 @@ export default function ChatDemo() {
           <div className="bg-background/40 backdrop-blur-lg rounded-2xl border border-accent/20 p-4 md:p-6">
             <div className="space-y-4">
               {messages.map((message, index) => (
-                <motion.div
-                  key={index}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  style={{
-                    opacity: messageTransforms[index].opacity,
-                    x: messageTransforms[index].x,
-                  }}
-                >
-                  <div 
-                    className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                      message.role === 'user' 
-                        ? 'bg-accent text-background ml-4'
-                        : 'bg-foreground/10 backdrop-blur-sm mr-4'
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                  </div>
-                </motion.div>
+                <ChatMessage 
+                  key={index} 
+                  message={message} 
+                  index={index} 
+                  scrollYProgress={scrollYProgress} 
+                />
               ))}
             </div>
           </div>
