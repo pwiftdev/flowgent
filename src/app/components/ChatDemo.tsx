@@ -33,6 +33,20 @@ export default function ChatDemo() {
     offset: ["start end", "end start"]
   });
 
+  // Create transform values for each message
+  const messageTransforms = messages.map((_, index) => ({
+    opacity: useTransform(
+      scrollYProgress,
+      [0, 0.1 + index * 0.1, 0.2 + index * 0.1, 0.4 + index * 0.1, 0.8],
+      [0, 0, 1, 1, 0]
+    ),
+    x: useTransform(
+      scrollYProgress,
+      [0, 0.1 + index * 0.1, 0.2 + index * 0.1, 0.4 + index * 0.1, 0.8],
+      [messages[index].role === 'user' ? 50 : -50, 0]
+    )
+  }));
+
   return (
     <section className="relative py-32 overflow-hidden" ref={containerRef}>
       <div className="container mx-auto px-4">
@@ -48,34 +62,26 @@ export default function ChatDemo() {
         <div className="max-w-2xl mx-auto">
           <div className="bg-background/40 backdrop-blur-lg rounded-2xl border border-accent/20 p-4 md:p-6">
             <div className="space-y-4">
-              {messages.map((message, index) => {
-                const messageProgress = useTransform(
-                  scrollYProgress,
-                  [0, 0.1 + index * 0.1, 0.2 + index * 0.1, 0.4 + index * 0.1, 0.8],
-                  [0, 0, 1, 1, 0]
-                );
-
-                return (
-                  <motion.div
-                    key={index}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    style={{
-                      opacity: messageProgress,
-                      x: message.role === 'user' ? useTransform(messageProgress, [0, 1], [50, 0]) : useTransform(messageProgress, [0, 1], [-50, 0]),
-                    }}
+              {messages.map((message, index) => (
+                <motion.div
+                  key={index}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  style={{
+                    opacity: messageTransforms[index].opacity,
+                    x: messageTransforms[index].x,
+                  }}
+                >
+                  <div 
+                    className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                      message.role === 'user' 
+                        ? 'bg-accent text-background ml-4'
+                        : 'bg-foreground/10 backdrop-blur-sm mr-4'
+                    }`}
                   >
-                    <div 
-                      className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                        message.role === 'user' 
-                          ? 'bg-accent text-background ml-4'
-                          : 'bg-foreground/10 backdrop-blur-sm mr-4'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                    </div>
-                  </motion.div>
-                );
-              })}
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>

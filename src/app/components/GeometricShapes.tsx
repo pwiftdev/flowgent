@@ -16,6 +16,12 @@ export default function GeometricShapes() {
   const rotate2 = useTransform(scrollYProgress, [0, 1], [45, -315]);
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.2, 1]);
 
+  // Create transform values for floating circles
+  const circleTransforms = [...Array(3)].map((_, i) => ({
+    y: useTransform(scrollYProgress, [0, 1], [0, (i + 1) * 50]),
+    scale: useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.1, 1])
+  }));
+
   return (
     <div ref={ref} className="relative w-full h-full">
       {/* Background grid */}
@@ -54,8 +60,8 @@ export default function GeometricShapes() {
           <motion.div
             key={i}
             style={{
-              y: useTransform(scrollYProgress, [0, 1], [0, (i + 1) * 50]),
-              scale: useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.1, 1])
+              y: circleTransforms[i].y,
+              scale: circleTransforms[i].scale
             }}
             className="absolute"
             initial={{ opacity: 0 }}

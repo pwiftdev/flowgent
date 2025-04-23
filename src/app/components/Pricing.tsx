@@ -49,7 +49,7 @@ export default function Pricing() {
               </div>
 
               <div>
-                <h4 className="text-lg font-semibold mb-4">What's Included:</h4>
+                <h4 className="text-lg font-semibold mb-4">What&apos;s Included:</h4>
                 <ul className="grid md:grid-cols-2 gap-4">
                   {features.map((feature) => (
                     <li key={feature} className="flex items-center gap-3">

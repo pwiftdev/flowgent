@@ -224,7 +224,7 @@ export default function Hero() {
       }, 200);
       return () => clearTimeout(timeout);
     }
-  }, [text, currentLine]);
+  }, [text, currentLine, typingText]);
 
   return (
     <>
