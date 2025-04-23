@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import GeometricShapes from './GeometricShapes';
 
 const SpinningShapes = () => (
@@ -188,20 +188,20 @@ export default function Hero() {
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
   const [currentLine, setCurrentLine] = useState(0);
 
-  const typingText = ['WE AUTOMATE,', 'YOU ACCELERATE.'];
-  const finalText = [
+  const typingText = useMemo(() => ['WE AUTOMATE,', 'YOU ACCELERATE.'], []);
+  const finalText = useMemo(() => [
     'TRANSFORMING',
     'CUSTOMER SERVICE',
     'WITH AI CHATBOTS'
-  ];
+  ], []);
 
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setShowCursor(prev => !prev);
-    }, 400);
+    }, 500);
 
     return () => clearInterval(cursorInterval);
-  }, []);
+  }, [typingText]);
 
   useEffect(() => {
     if (currentLine === 0) {
