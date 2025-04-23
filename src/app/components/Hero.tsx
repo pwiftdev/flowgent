@@ -272,9 +272,9 @@ export default function Hero() {
       {/* Main content */}
       <section className="min-h-screen pt-32 pb-16 flex items-center overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-center relative">
             <motion.div 
-              className="space-y-8"
+              className="space-y-8 relative z-20"
               initial={{ opacity: 0 }}
               animate={{ opacity: !isOverlayVisible ? 1 : 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -303,13 +303,13 @@ export default function Hero() {
                 transition={{ duration: 0.5, delay: 0.7 }}
               >
                 <a 
-                  href="#contact" 
+                  href="#how-it-works" 
                   className="neon-border px-8 py-4 text-center font-medium hover:bg-accent/10 transition-colors"
                 >
                   Get Started
                 </a>
                 <a 
-                  href="#demo" 
+                  href="#chat-demo" 
                   className="px-8 py-4 text-center border border-foreground/20 hover:border-accent transition-colors"
                 >
                   View Demo
@@ -318,7 +318,7 @@ export default function Hero() {
             </motion.div>
 
             <motion.div 
-              className="relative h-[500px] hidden lg:block"
+              className="relative h-[300px] md:h-[400px] lg:h-[500px] order-first lg:order-last absolute lg:relative inset-0 lg:inset-auto z-10 lg:z-20"
               initial={{ opacity: 0 }}
               animate={{ opacity: !isOverlayVisible ? 1 : 0 }}
               transition={{ duration: 0.5, delay: 0.9 }}

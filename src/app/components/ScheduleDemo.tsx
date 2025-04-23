@@ -1,43 +1,35 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useEffect } from 'react';
+import Script from 'next/script';
 
 export default function ScheduleDemo() {
   return (
-    <section className="relative w-full py-24 bg-black">
-      {/* Background glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#001106] via-black to-black" />
+    <section className="relative py-20 bg-[#001106]">
+      {/* Background gradient and effects */}
+      <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/30 via-purple-900/30 to-emerald-900/30 animate-gradient-x" />
       
-      <div className="relative z-10 container mx-auto px-4">
-        {/* Title */}
-        <motion.div 
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-600">
-            Schedule A Demo
-          </h2>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            Book a personalized demo to see how our AI chatbot can transform your business.
-          </p>
-        </motion.div>
-
-        {/* Calendar Container */}
-        <motion.div 
-          className="max-w-4xl mx-auto bg-black/50 rounded-xl border border-emerald-500/20 p-4 backdrop-blur-sm"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          {/* Placeholder for Google Calendar Embed */}
-          <div className="w-full aspect-[4/3] bg-black/40 rounded-lg border border-emerald-500/10">
-            {/* Google Calendar will be embedded here */}
-          </div>
-        </motion.div>
+      {/* Content container */}
+      <div className="container mx-auto px-4 relative z-10">
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-glow">
+          Schedule a Demo
+        </h2>
+        <p className="text-lg text-center text-gray-300 mb-10 max-w-2xl mx-auto">
+          Book a free 30 minutes consultation call with our team, to see how we can help your business streamline repetitive tasks.
+        </p>
+        
+        {/* Calendly inline widget */}
+        <div 
+          className="calendly-inline-widget rounded-lg overflow-hidden mx-auto"
+          data-url="https://calendly.com/mickovicbalsa-work/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=001e0b&text_color=ffffff"
+          style={{ minWidth: '320px', height: '700px' }}
+        />
+        
+        {/* Calendly script */}
+        <Script
+          src="https://assets.calendly.com/assets/external/widget.js"
+          strategy="lazyOnload"
+        />
       </div>
     </section>
   );

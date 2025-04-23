@@ -11,6 +11,9 @@ import GradientBackground from './components/GradientBackground';
 import PurpleGlow from './components/PurpleGlow';
 import ScheduleDemo from './components/ScheduleDemo';
 import Footer from './components/Footer';
+import CallUs from './components/CallUs';
+import { motion } from 'framer-motion';
+import GeometricShapes from './components/GeometricShapes';
 
 export default function Home() {
   return (
@@ -53,18 +56,23 @@ export default function Home() {
 
       {/* Features Section - Animated gradient background with medium-density glow */}
       <GradientBackground>
-        <PurpleGlow density="medium" className="opacity-50" />
-        <Features />
+        <div id="features">
+          <PurpleGlow density="medium" className="opacity-50" />
+          <Features />
+        </div>
       </GradientBackground>
 
+      {/* Call Us Section */}
+      <CallUs />
+
       {/* How It Works Section - Regular background with low-density glow */}
-      <div className="relative">
+      <div id="how-it-works" className="relative">
         <PurpleGlow density="low" className="opacity-70" />
         <HowItWorks />
       </div>
 
       {/* Chat Demo Section - Dark background with medium-density glow */}
-      <div className="relative bg-[#001106]">
+      <div id="chat-demo" className="relative bg-[#001106]">
         <PurpleGlow density="medium" className="opacity-60" />
         <ChatDemo />
       </div>
@@ -97,12 +105,16 @@ export default function Home() {
 
       {/* Pricing Section - Animated gradient background with high-density glow */}
       <GradientBackground>
-        <PurpleGlow density="high" className="opacity-50" />
-        <Pricing />
+        <div id="pricing">
+          <PurpleGlow density="high" className="opacity-50" />
+          <Pricing />
+        </div>
       </GradientBackground>
 
       {/* Schedule Demo Section */}
-      <ScheduleDemo />
+      <div id="schedule-demo">
+        <ScheduleDemo />
+      </div>
 
       {/* Footer */}
       <Footer />
