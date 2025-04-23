@@ -106,7 +106,7 @@ export default function Header() {
           className={`neon-border px-6 py-2 text-sm font-medium transition-all ${
             activeSection === 'schedule-demo' 
               ? 'bg-emerald-500/20 text-emerald-400' 
-              : 'hover:bg-accent/10'
+              : 'hover:bg-purple-900/90 hover:border-purple-800'
           }`}
         >
           Schedule a Demo

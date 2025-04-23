@@ -180,6 +180,102 @@ const SpinningShapes = () => (
   </>
 );
 
+// Typing text effect component with smoother animation
+const TypingText = ({ 
+  text, 
+  delay = 0, 
+  className = "", 
+  speed = 50,
+  style = {}
+}: { 
+  text: string; 
+  delay?: number; 
+  className?: string; 
+  speed?: number;
+  style?: React.CSSProperties;
+}) => {
+  const [displayText, setDisplayText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Delay before starting to type
+    const visibilityTimeout = setTimeout(() => {
+      setIsVisible(true);
+    }, delay);
+
+    return () => clearTimeout(visibilityTimeout);
+  }, [delay]);
+
+  useEffect(() => {
+    if (isVisible && currentIndex < text.length && isTyping) {
+      const timeout = setTimeout(() => {
+        setDisplayText(text.slice(0, currentIndex + 1));
+        setCurrentIndex(currentIndex + 1);
+      }, speed);
+      return () => clearTimeout(timeout);
+    } else if (currentIndex === text.length) {
+      // Keep isTyping true to maintain the cursor
+      setIsTyping(true);
+    }
+  }, [currentIndex, isTyping, text, isVisible, speed]);
+
+  if (!isVisible) return null;
+
+  return (
+    <motion.div 
+      className={`relative ${className}`} 
+      style={style}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <span className="text-glow">{displayText}</span>
+      <span className="text-glow ml-1 animate-pulse">_</span>
+    </motion.div>
+  );
+};
+
+// Floating text component with fade in/out
+const FloatingText = ({ text, delay = 0, className = "" }: { text: string; delay?: number; className?: string }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsVisible(true);
+    }, delay);
+
+    return () => clearTimeout(timeout);
+  }, [delay]);
+
+  return (
+    <motion.div
+      className={`absolute ${className}`}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ 
+        opacity: isVisible ? 0.3 : 0,
+        y: isVisible ? 0 : 10
+      }}
+      transition={{ 
+        duration: 1.5,
+        ease: "easeOut"
+      }}
+    >
+      {text}
+    </motion.div>
+  );
+};
+
+// Dimmed text component
+const DimmedText = ({ text, className = "" }: { text: string; className?: string }) => {
+  return (
+    <div className={`text-foreground/20 ${className}`}>
+      {text}
+    </div>
+  );
+};
+
 export default function Hero() {
   const [text1, setText1] = useState('');
   const [text2, setText2] = useState('');
@@ -194,6 +290,42 @@ export default function Hero() {
     'CUSTOMER SERVICE',
     'WITH AI CHATBOTS'
   ], []);
+
+  // New text options
+  const textOptions = useMemo(() => [
+    'Conversational',
+    'Automated',
+    'Intelligent',
+    'Adaptive',
+    'Responsive',
+    'Scalable',
+    'Seamless',
+    'Instant'
+  ], []);
+
+  // Predefined positions to avoid overlap
+  const textPositions = useMemo(() => [
+    { left: '10%', top: '15%', fontSize: '1rem' },
+    { left: '25%', top: '35%', fontSize: '1.2rem' },
+    { left: '60%', top: '20%', fontSize: '0.9rem' },
+    { left: '75%', top: '45%', fontSize: '1.1rem' },
+    { left: '15%', top: '65%', fontSize: '1.3rem' },
+    { left: '45%', top: '70%', fontSize: '0.8rem' },
+    { left: '80%', top: '25%', fontSize: '1rem' },
+    { left: '30%', top: '80%', fontSize: '1.2rem' }
+  ], []);
+
+  // Track scroll position for animations
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const cursorInterval = setInterval(() => {
@@ -318,12 +450,60 @@ export default function Hero() {
             </motion.div>
 
             <motion.div 
-              className="relative h-[300px] md:h-[400px] lg:h-[500px] order-first lg:order-last absolute lg:relative inset-0 lg:inset-auto z-10 lg:z-20"
+              className="relative h-[300px] md:h-[400px] lg:h-[500px] order-first lg:order-last lg:relative inset-0 lg:inset-auto z-10 lg:z-20"
               initial={{ opacity: 0 }}
               animate={{ opacity: !isOverlayVisible ? 1 : 0 }}
               transition={{ duration: 0.5, delay: 0.9 }}
             >
               <GeometricShapes />
+              
+              {/* Scattered text with typing animation - only visible after overlay disappears */}
+              <motion.div 
+                className="absolute inset-0 pointer-events-none overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: !isOverlayVisible ? 1 : 0 }}
+                transition={{ duration: 0.5, delay: 1.5 }}
+              >
+                {textOptions.map((text, index) => {
+                  // Calculate scroll-based animations
+                  const scrollProgress = Math.min(Math.max(scrollY / 500, 0), 1);
+                  const isEven = index % 2 === 0;
+                  
+                  // Alternate between left and right movement
+                  const xOffset = isEven 
+                    ? -scrollProgress * 100 // Move left
+                    : scrollProgress * 100; // Move right
+                  
+                  // Fade out as user scrolls
+                  const opacity = 1 - scrollProgress * 0.8;
+                  
+                  // Scale down slightly as user scrolls
+                  const scale = 1 - scrollProgress * 0.2;
+                  
+                  return (
+                    <motion.div
+                      key={index}
+                      style={{
+                        position: 'absolute',
+                        left: textPositions[index].left,
+                        top: textPositions[index].top,
+                        fontSize: textPositions[index].fontSize,
+                        opacity,
+                        x: xOffset,
+                        scale,
+                        transformOrigin: isEven ? 'left center' : 'right center'
+                      }}
+                    >
+                      <TypingText
+                        text={text}
+                        delay={index * 1000 + 2000} // Start after overlay disappears (2s) + staggered delay
+                        speed={80} // Slower typing speed
+                        className="text-emerald-500/70 font-medium"
+                      />
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
             </motion.div>
           </div>
         </div>

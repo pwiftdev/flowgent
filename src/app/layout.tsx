@@ -16,8 +16,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={jetbrainsMono.className}>
+    <html lang="en" className="overflow-x-hidden">
+      <head>
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+      </head>
+      <body className={jetbrainsMono.className} overflow-x-hidden>
         <Providers>
           {children}
         </Providers>

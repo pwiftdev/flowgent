@@ -114,6 +114,10 @@ export default function Features() {
               key={index}
               variants={itemVariants}
               className="relative group"
+              whileHover={{ 
+                scale: 1.05,
+                transition: { duration: 0.3 }
+              }}
             >
               <div className="p-8 rounded-lg border border-foreground/10 hover:border-accent/50 transition-all duration-300 bg-background/50 backdrop-blur-sm hover:bg-accent/5">
                 <div className="text-accent mb-6">{feature.icon}</div>
