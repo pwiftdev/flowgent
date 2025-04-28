@@ -66,46 +66,59 @@ export async function POST(req: Request) {
     const resend = new Resend(resendApiKey);
 
     console.log('Attempting to send email to:', adminEmail);
-    // Send email to admin
-    const { data: emailResponse, error } = await resend.emails.send({
-      from: 'Flowgent <no-reply@flowgent.com>',
-      to: adminEmail,
-      subject: 'New Inquiry from Flowgent Website',
-      html: `
-        <h2>New Inquiry Received</h2>
-        <p><strong>From:</strong> ${inquiryDetails.name}</p>
-        <p><strong>Email:</strong> ${inquiryDetails.email}</p>
-        <p><strong>Phone:</strong> ${inquiryDetails.phone}</p>
-        <p><strong>Company:</strong> ${inquiryDetails.company}</p>
-        <p><strong>Company Size:</strong> ${inquiryDetails.companySize}</p>
-        <p><strong>Message:</strong></p>
-        <p>${inquiryDetails.message}</p>
-        <p><em>Sent at: ${inquiryDetails.timestamp}</em></p>
-      `
-    });
+    try {
+      // Send email to admin
+      const { data: emailResponse, error } = await resend.emails.send({
+        from: 'Flowgent <onboarding@resend.dev>',
+        to: adminEmail,
+        subject: 'New Inquiry from Flowgent Website',
+        html: `
+          <h2>New Inquiry Received</h2>
+          <p><strong>From:</strong> ${inquiryDetails.name}</p>
+          <p><strong>Email:</strong> ${inquiryDetails.email}</p>
+          <p><strong>Phone:</strong> ${inquiryDetails.phone}</p>
+          <p><strong>Company:</strong> ${inquiryDetails.company}</p>
+          <p><strong>Company Size:</strong> ${inquiryDetails.companySize}</p>
+          <p><strong>Message:</strong></p>
+          <p>${inquiryDetails.message}</p>
+          <p><em>Sent at: ${inquiryDetails.timestamp}</em></p>
+        `
+      });
 
-    if (error) {
-      console.error('Failed to send email:', error);
+      if (error) {
+        console.error('Failed to send email:', error);
+        return new NextResponse(
+          JSON.stringify({ error: `Failed to send inquiry email: ${error.message}` }),
+          { 
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
+
+      console.log('Email sent successfully');
       return new NextResponse(
-        JSON.stringify({ error: `Failed to send inquiry email: ${error.message}` }),
+        JSON.stringify({ 
+          success: true,
+          message: 'Inquiry received successfully'
+        }),
+        { 
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+      return new NextResponse(
+        JSON.stringify({ 
+          error: emailError instanceof Error ? emailError.message : 'Failed to send email'
+        }),
         { 
           status: 500,
           headers: { 'Content-Type': 'application/json' }
         }
       );
     }
-
-    console.log('Email sent successfully');
-    return new NextResponse(
-      JSON.stringify({ 
-        success: true,
-        message: 'Inquiry received successfully'
-      }),
-      { 
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
   } catch (error) {
     console.error('Contact form error:', error);
     return new NextResponse(
