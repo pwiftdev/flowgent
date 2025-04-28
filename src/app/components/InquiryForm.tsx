@@ -83,7 +83,7 @@ export default function InquiryForm() {
             Send an Inquiry
           </h2>
           <p className="text-lg text-center text-gray-300 mb-12 max-w-2xl mx-auto">
-            Tell us about your project and we'll get back to you within 24 hours with a tailored solution. Our team will also offer you a free consultation call.
+            Tell us about your project and we&apos;ll get back to you within 24 hours with a tailored solution. Our team will also offer you a free consultation call.
           </p>
 
           <motion.form 
@@ -105,6 +105,9 @@ export default function InquiryForm() {
                   className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40"
                   placeholder="First Name"
                 />
+                {!formData.firstName && (
+                  <p className="text-red-500 text-sm mt-1">Please enter your first name</p>
+                )}
               </div>
 
               {/* Last Name field */}
@@ -117,6 +120,9 @@ export default function InquiryForm() {
                   className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40"
                   placeholder="Last Name"
                 />
+                {!formData.lastName && (
+                  <p className="text-red-500 text-sm mt-1">Please enter your last name</p>
+                )}
               </div>
 
               {/* Company field */}
@@ -144,6 +150,9 @@ export default function InquiryForm() {
                     <option key={size} value={size} className="bg-black">{size}</option>
                   ))}
                 </select>
+                {!formData.companySize && (
+                  <p className="text-red-500 text-sm mt-1">Please select your company size</p>
+                )}
               </div>
 
               {/* Email field */}
@@ -156,6 +165,9 @@ export default function InquiryForm() {
                   className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40"
                   placeholder="Email"
                 />
+                {!formData.email && (
+                  <p className="text-red-500 text-sm mt-1">Please enter your email address</p>
+                )}
               </div>
 
               {/* Phone field */}
@@ -180,6 +192,9 @@ export default function InquiryForm() {
                 className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 min-h-[150px] resize-y hover:border-emerald-500/40"
                 placeholder="Write your message..."
               />
+              {!formData.message && (
+                <p className="text-red-500 text-sm mt-1">Please enter your message</p>
+              )}
             </div>
 
             {/* Submit Button */}
@@ -202,7 +217,7 @@ export default function InquiryForm() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-emerald-500 text-center"
               >
-                Message sent successfully! We'll get back to you soon.
+                Message sent successfully! We&apos;ll get back to you soon.
               </motion.div>
             )}
             {status === 'error' && (

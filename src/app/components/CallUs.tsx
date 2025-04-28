@@ -27,8 +27,8 @@ const CallUsContent = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-glow">
               Ready to Transform Your Business?
             </h2>
-            <p className="text-lg text-center text-gray-300 mb-2 max-w-2xl mx-auto">
-              Tell us about your project and we'll get back to you within 24 hours with a tailored solution. Our team will also offer you a free consultation call.
+            <p className="text-lg text-foreground/80">
+              Let&apos;s discuss how we can help your business grow with AI
             </p>
           </motion.div>
           <motion.div
