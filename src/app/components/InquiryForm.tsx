@@ -1,77 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 
-interface FormData {
-  firstName: string;
-  lastName: string;
-  company: string;
-  companySize: string;
-  email: string;
-  phone: string;
-  message: string;
-}
-
-const companySizes = [
-  '1-5 employees',
-  '5-20 employees',
-  '20+ employees'
-];
-
-export default function InquiryForm() {
-  const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    lastName: '',
-    company: '',
-    companySize: '',
-    email: '',
-    phone: '',
-    message: ''
-  });
-
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState<string>('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('loading');
-    setErrorMessage('');
-    
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
-      }
-      
-      setStatus('success');
-      setFormData({
-        firstName: '',
-        lastName: '',
-        company: '',
-        companySize: '',
-        email: '',
-        phone: '',
-        message: ''
-      });
-    } catch (error) {
-      console.error('Form submission error:', error);
-      setStatus('error');
-      setErrorMessage(
-        error instanceof Error 
-          ? error.message 
-          : 'An unexpected error occurred. Please try again.'
-      );
-    }
-  };
-
+export default function CalendarScheduler() {
   return (
     <section className="relative py-24 bg-[#001106] overflow-hidden">
       {/* Animated background elements */}
@@ -89,159 +20,29 @@ export default function InquiryForm() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-3xl mx-auto"
+          className="max-w-4xl mx-auto"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-glow">
-            Send an Inquiry
+            Schedule a Meeting
           </h2>
           <p className="text-lg text-center text-gray-300 mb-12 max-w-2xl mx-auto">
-            Tell us about your project and we&apos;ll get back to you within 24 hours with a tailored solution. Our team will also offer you a free consultation call.
+            Book a time that works best for you. We&apos;ll discuss your project needs and how we can help you achieve your goals.
           </p>
 
-          <motion.form 
-            onSubmit={handleSubmit} 
-            className="space-y-6 backdrop-blur-sm bg-black/20 p-8 rounded-2xl border border-emerald-500/20 shadow-2xl"
+          <motion.div 
+            className="backdrop-blur-sm bg-black/20 p-8 rounded-2xl border border-emerald-500/20 shadow-2xl"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* First Name field */}
-              <div className="relative">
-                <input
-                  type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40"
-                  placeholder="First Name"
-                />
-                {!formData.firstName && (
-                  <p className="text-red-500 text-sm mt-1">Please enter your first name</p>
-                )}
-              </div>
-
-              {/* Last Name field */}
-              <div className="relative">
-                <input
-                  type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40"
-                  placeholder="Last Name"
-                />
-                {!formData.lastName && (
-                  <p className="text-red-500 text-sm mt-1">Please enter your last name</p>
-                )}
-              </div>
-
-              {/* Company field */}
-              <div className="relative">
-                <input
-                  type="text"
-                  required
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40"
-                  placeholder="Company"
-                />
-              </div>
-
-              {/* Company Size field */}
-              <div className="relative">
-                <select
-                  required
-                  value={formData.companySize}
-                  onChange={(e) => setFormData({ ...formData, companySize: e.target.value })}
-                  className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40 appearance-none"
-                >
-                  <option value="" className="bg-black">Select Company Size</option>
-                  {companySizes.map((size) => (
-                    <option key={size} value={size} className="bg-black">{size}</option>
-                  ))}
-                </select>
-                {!formData.companySize && (
-                  <p className="text-red-500 text-sm mt-1">Please select your company size</p>
-                )}
-              </div>
-
-              {/* Email field */}
-              <div className="relative">
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40"
-                  placeholder="Email"
-                />
-                {!formData.email && (
-                  <p className="text-red-500 text-sm mt-1">Please enter your email address</p>
-                )}
-              </div>
-
-              {/* Phone field */}
-              <div className="relative">
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 hover:border-emerald-500/40"
-                  placeholder="Phone Number"
-                />
-              </div>
-            </div>
-
-            {/* Message field */}
-            <div className="relative">
-              <textarea
-                required
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full bg-black/40 border border-emerald-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all duration-300 min-h-[150px] resize-y hover:border-emerald-500/40"
-                placeholder="Write your message..."
-              />
-              {!formData.message && (
-                <p className="text-red-500 text-sm mt-1">Please enter your message</p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <motion.button
-              type="submit"
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-black transition-all duration-300 relative overflow-hidden group"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <span className="relative z-10">
-                {status === 'loading' ? 'Sending...' : 'Send Message'}
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </motion.button>
-
-            {/* Status Messages */}
-            {status === 'success' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-emerald-500 text-center"
-              >
-                Message sent successfully! We&apos;ll get back to you soon.
-              </motion.div>
-            )}
-            {status === 'error' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-red-500 text-center"
-              >
-                {errorMessage}
-              </motion.div>
-            )}
-          </motion.form>
+            {/* Google Calendar Appointment Scheduling */}
+            <iframe 
+              src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ07OkzRKN7Oklsdkah192Ie-Uz300O-o36-tKtQOhvQR1GJoOZeHM2YE-8eYef8_9RUkC6W_Ue9?gv=true" 
+              className="w-full h-[600px] border-0"
+              frameBorder="0"
+            />
+          </motion.div>
         </motion.div>
       </div>
     </section>
