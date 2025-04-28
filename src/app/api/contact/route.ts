@@ -20,10 +20,9 @@ export async function OPTIONS() {
 // For local testing without Resend
 const ADMIN_EMAIL = 'mickovicbalsa.work@gmail.com';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const data = await req.json();
     
     // Basic validation
@@ -37,7 +36,7 @@ export async function POST(req: Request) {
     try {
       const { data: emailResponse, error } = await resend.emails.send({
         from: 'Flowgent <onboarding@resend.dev>',
-        to: [process.env.ADMIN_EMAIL || ''],
+        to: [process.env.ADMIN_EMAIL || 'mickovicbalsa.work@gmail.com'],
         subject: 'New Inquiry from Flowgent Website',
         html: `
           <h2>New Inquiry Received</h2>
