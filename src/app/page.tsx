@@ -9,11 +9,12 @@ import ChatDemo from './components/ChatDemo';
 import AnimatedBackground from './components/AnimatedBackground';
 import GradientBackground from './components/GradientBackground';
 import PurpleGlow from './components/PurpleGlow';
-import ScheduleDemo from './components/ScheduleDemo';
+import InquiryForm from './components/InquiryForm';
 import Footer from './components/Footer';
 import CallUs from './components/CallUs';
 import { motion } from 'framer-motion';
 import GeometricShapes from './components/GeometricShapes';
+import UseCases from './components/UseCases';
 
 export default function Home() {
   return (
@@ -55,6 +56,7 @@ export default function Home() {
       </div>
 
       {/* Features Section - Animated gradient background with medium-density glow */}
+      <UseCases />
       <GradientBackground>
         <div id="features">
           <PurpleGlow density="medium" className="opacity-50" />
@@ -111,9 +113,9 @@ export default function Home() {
         </div>
       </GradientBackground>
 
-      {/* Schedule Demo Section */}
-      <div id="schedule-demo">
-        <ScheduleDemo />
+      {/* Inquiry Form Section */}
+      <div id="inquiry-form">
+        <InquiryForm />
       </div>
 
       {/* Footer */}

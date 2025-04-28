@@ -1,9 +1,22 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import AnimatedBackground from './AnimatedBackground';
+import { useEffect, useRef, useState } from 'react';
 
-const features = [
+interface Feature {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+}
+
+interface FeatureCardProps {
+  feature: Feature;
+  index: number;
+  isMobile: boolean;
+}
+
+const features: Feature[] = [
   {
     title: 'Natural Language Processing',
     description: 'Advanced NLP capabilities for human-like conversations and understanding context.',
@@ -61,36 +74,134 @@ const features = [
   }
 ];
 
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
+// Generate random entry animations for desktop
+const getRandomEntry = () => {
+  const entries = [
+    { x: -50, y: -50 },
+    { x: 50, y: -50 },
+    { x: -50, y: 50 },
+    { x: 50, y: 50 },
+    { x: 0, y: -50 },
+    { x: 0, y: 50 },
+    { x: -50, y: 0 },
+    { x: 50, y: 0 },
+  ];
+  return entries[Math.floor(Math.random() * entries.length)];
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5
-    }
-  }
-};
+// Mobile entry animations from different angles
+const mobileEntries = [
+  { x: -100, y: 0 },    // from left
+  { x: 100, y: 0 },     // from right
+  { x: 0, y: 100 },     // from bottom
+  { x: -100, y: 100 },  // from bottom-left
+  { x: 100, y: 100 },   // from bottom-right
+  { x: 0, y: -100 },    // from top
+];
+
+// Create a FeatureCard component to handle individual animations
+function FeatureCard({ feature, index, isMobile }: FeatureCardProps) {
+  const cardRef = useRef(null);
+  const isInView = useInView(cardRef, { 
+    once: true,
+    amount: 0.2,
+    margin: "0px 0px -100px 0px" // Starts animation slightly before the element comes into view
+  });
+
+  // For mobile, use predefined angles
+  const mobileEntry = mobileEntries[index % mobileEntries.length];
+  // For desktop, use random entry points
+  const desktopEntry = getRandomEntry();
+  
+  const entryAnimation = isMobile ? mobileEntry : desktopEntry;
+
+  return (
+    <motion.div
+      ref={cardRef}
+      className="relative group"
+      initial={{ 
+        opacity: 0,
+        x: entryAnimation.x,
+        y: entryAnimation.y,
+      }}
+      animate={isInView ? {
+        opacity: 1,
+        x: 0,
+        y: 0,
+      } : {}}
+      transition={{ 
+        duration: 0.8,
+        delay: isMobile ? 0.2 : Math.random() * 0.3,
+        ease: "easeOut"
+      }}
+      whileHover={{ 
+        scale: 1.05,
+        transition: { duration: 0.3 }
+      }}
+    >
+      <div className="p-8 rounded-lg border border-foreground/10 hover:border-accent/50 transition-all duration-300 bg-background/50 backdrop-blur-sm hover:bg-accent/5">
+        <motion.div 
+          className="text-accent mb-6"
+          initial={{ scale: 0.5, rotate: -180 }}
+          animate={isInView ? { scale: 1, rotate: 0 } : {}}
+          transition={{ 
+            duration: 0.5,
+            delay: isMobile ? 0.2 : Math.random() * 0.3
+          }}
+        >
+          {feature.icon}
+        </motion.div>
+        <motion.h3 
+          className="text-xl font-semibold mb-3"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ 
+            duration: 0.5,
+            delay: 0.3
+          }}
+        >
+          {feature.title}
+        </motion.h3>
+        <motion.p 
+          className="text-foreground/70 text-sm leading-relaxed"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ 
+            duration: 0.5,
+            delay: 0.4
+          }}
+        >
+          {feature.description}
+        </motion.p>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function Features() {
+  const [isMobile, setIsMobile] = useState(false);
+  const titleRef = useRef(null);
+  const isTitleInView = useInView(titleRef, { once: true, amount: 0.2 });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <section id="features" className="py-24 relative overflow-hidden">
       <AnimatedBackground variant="sparse" />
       
       <div className="container mx-auto px-4">
         <motion.div
+          ref={titleRef}
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={isTitleInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
@@ -102,31 +213,16 @@ export default function Features() {
           </p>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <motion.div
+            <FeatureCard
               key={index}
-              variants={itemVariants}
-              className="relative group"
-              whileHover={{ 
-                scale: 1.05,
-                transition: { duration: 0.3 }
-              }}
-            >
-              <div className="p-8 rounded-lg border border-foreground/10 hover:border-accent/50 transition-all duration-300 bg-background/50 backdrop-blur-sm hover:bg-accent/5">
-                <div className="text-accent mb-6">{feature.icon}</div>
-                <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                <p className="text-foreground/70 text-sm leading-relaxed">{feature.description}</p>
-              </div>
-            </motion.div>
+              feature={feature}
+              index={index}
+              isMobile={isMobile}
+            />
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
