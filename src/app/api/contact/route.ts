@@ -6,26 +6,33 @@ export const runtime = 'nodejs';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Add OPTIONS method for CORS
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
+// Helper function to handle CORS
+function corsResponse(response: NextResponse) {
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+  return response;
 }
 
 // For local testing without Resend
 const ADMIN_EMAIL = 'mickovicbalsa.work@gmail.com';
 
+export async function OPTIONS() {
+  return corsResponse(new NextResponse(null, { status: 204 }));
+}
+
 export async function POST(req: Request) {
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return corsResponse(new NextResponse(null, { status: 204 }));
+  }
+
   if (!process.env.RESEND_API_KEY) {
-    return NextResponse.json(
-      { error: 'Resend API key not configured' },
-      { status: 500 }
+    return corsResponse(
+      NextResponse.json(
+        { error: 'Resend API key not configured' },
+        { status: 500 }
+      )
     );
   }
 
@@ -33,9 +40,11 @@ export async function POST(req: Request) {
     const data = await req.json();
     
     if (!data.firstName || !data.lastName || !data.email || !data.message) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+      return corsResponse(
+        NextResponse.json(
+          { error: 'Missing required fields' },
+          { status: 400 }
+        )
       );
     }
 
@@ -56,21 +65,28 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      return NextResponse.json(
-        { error: 'Failed to send email' },
-        { status: 500 }
+      return corsResponse(
+        NextResponse.json(
+          { error: 'Failed to send email' },
+          { status: 500 }
+        )
       );
     }
 
-    return NextResponse.json({ 
-      success: true,
-      message: 'Email sent successfully'
-    });
+    return corsResponse(
+      NextResponse.json({ 
+        success: true,
+        message: 'Email sent successfully'
+      })
+    );
 
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Server error' },
-      { status: 500 }
+    console.error('API Error:', error);
+    return corsResponse(
+      NextResponse.json(
+        { error: 'Server error' },
+        { status: 500 }
+      )
     );
   }
 } 
