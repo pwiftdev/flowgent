@@ -5,14 +5,21 @@ import { Resend } from 'resend';
 const ADMIN_EMAIL = 'mickovicbalsa.work@gmail.com';
 
 export async function POST(req: Request) {
+  console.log('Received contact form submission');
+  
   try {
     const data = await req.json();
+    console.log('Form data received:', data);
     
     // Basic validation
     if (!data.firstName || !data.lastName || !data.email || !data.message) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+      console.log('Missing required fields');
+      return new NextResponse(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
@@ -26,14 +33,18 @@ export async function POST(req: Request) {
       message: data.message,
       timestamp: new Date().toISOString()
     };
+    console.log('Formatted inquiry details:', inquiryDetails);
 
     // Check if we have the Resend API key
     const resendApiKey = process.env.RESEND_API_KEY;
     if (!resendApiKey) {
       console.error('Resend API key is not configured');
-      return NextResponse.json(
-        { error: 'Email service not configured (missing API key)' },
-        { status: 500 }
+      return new NextResponse(
+        JSON.stringify({ error: 'Email service not configured (missing API key)' }),
+        { 
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
@@ -41,15 +52,20 @@ export async function POST(req: Request) {
     const adminEmail = process.env.ADMIN_EMAIL;
     if (!adminEmail) {
       console.error('Admin email is not configured');
-      return NextResponse.json(
-        { error: 'Email service not configured (missing admin email)' },
-        { status: 500 }
+      return new NextResponse(
+        JSON.stringify({ error: 'Email service not configured (missing admin email)' }),
+        { 
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
+    console.log('Initializing Resend with API key');
     // Initialize Resend with the API key
     const resend = new Resend(resendApiKey);
 
+    console.log('Attempting to send email to:', adminEmail);
     // Send email to admin
     const { data: emailResponse, error } = await resend.emails.send({
       from: 'Flowgent <no-reply@flowgent.com>',
@@ -70,21 +86,36 @@ export async function POST(req: Request) {
 
     if (error) {
       console.error('Failed to send email:', error);
-      return NextResponse.json(
-        { error: `Failed to send inquiry email: ${error.message}` },
-        { status: 500 }
+      return new NextResponse(
+        JSON.stringify({ error: `Failed to send inquiry email: ${error.message}` }),
+        { 
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
-    return NextResponse.json({ 
-      success: true,
-      message: 'Inquiry received successfully'
-    });
+    console.log('Email sent successfully');
+    return new NextResponse(
+      JSON.stringify({ 
+        success: true,
+        message: 'Inquiry received successfully'
+      }),
+      { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   } catch (error) {
     console.error('Contact form error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to process inquiry' },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Failed to process inquiry'
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
     );
   }
 } 
