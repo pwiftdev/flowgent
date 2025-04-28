@@ -31,10 +31,12 @@ export default function InquiryForm() {
   });
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setErrorMessage('');
     
     try {
       const response = await fetch('/api/contact', {
@@ -43,7 +45,11 @@ export default function InquiryForm() {
         body: JSON.stringify(formData)
       });
 
-      if (!response.ok) throw new Error('Failed to send message');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
       
       setStatus('success');
       setFormData({
@@ -56,7 +62,9 @@ export default function InquiryForm() {
         message: ''
       });
     } catch (error) {
+      console.error('Form submission error:', error);
       setStatus('error');
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to send message. Please try again.');
     }
   };
 
@@ -226,7 +234,7 @@ export default function InquiryForm() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-red-500 text-center"
               >
-                Failed to send message. Please try again.
+                {errorMessage}
               </motion.div>
             )}
           </motion.form>

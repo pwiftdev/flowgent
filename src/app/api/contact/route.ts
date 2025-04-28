@@ -32,7 +32,17 @@ export async function POST(req: Request) {
     if (!resendApiKey) {
       console.error('Resend API key is not configured');
       return NextResponse.json(
-        { error: 'Email service not configured' },
+        { error: 'Email service not configured (missing API key)' },
+        { status: 500 }
+      );
+    }
+
+    // Check if we have the admin email
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (!adminEmail) {
+      console.error('Admin email is not configured');
+      return NextResponse.json(
+        { error: 'Email service not configured (missing admin email)' },
         { status: 500 }
       );
     }
@@ -43,7 +53,7 @@ export async function POST(req: Request) {
     // Send email to admin
     const { data: emailResponse, error } = await resend.emails.send({
       from: 'Flowgent <no-reply@flowgent.com>',
-      to: process.env.ADMIN_EMAIL || 'mickovicbalsa.work@gmail.com',
+      to: adminEmail,
       subject: 'New Inquiry from Flowgent Website',
       html: `
         <h2>New Inquiry Received</h2>
@@ -61,7 +71,7 @@ export async function POST(req: Request) {
     if (error) {
       console.error('Failed to send email:', error);
       return NextResponse.json(
-        { error: 'Failed to send inquiry email' },
+        { error: `Failed to send inquiry email: ${error.message}` },
         { status: 500 }
       );
     }
@@ -73,7 +83,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Contact form error:', error);
     return NextResponse.json(
-      { error: 'Failed to process inquiry' },
+      { error: error instanceof Error ? error.message : 'Failed to process inquiry' },
       { status: 500 }
     );
   }
