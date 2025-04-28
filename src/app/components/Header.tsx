@@ -104,7 +104,7 @@ export default function Header() {
                 : 'hover:bg-purple-900/90 hover:border-purple-800'
             }`}
           >
-            Send an Inquiry
+            Book a Call
           </Link>
         </nav>
 
@@ -211,7 +211,7 @@ export default function Header() {
                       className="neon-border block text-xl sm:text-2xl font-medium py-3 sm:py-4 px-6 sm:px-8 text-center w-full"
                       onClick={closeMenu}
                     >
-                      Send an Inquiry
+                      Book a Call
                     </Link>
                   </motion.div>
                 </nav>
