@@ -5,17 +5,43 @@ import { Resend } from 'resend';
 const ADMIN_EMAIL = 'mickovicbalsa.work@gmail.com';
 
 export async function POST(req: Request) {
-  console.log('Received contact form submission');
-  
   try {
-    const data = await req.json();
-    console.log('Form data received:', data);
+    // Log the raw request
+    const rawBody = await req.text();
+    console.log('Raw request body:', rawBody);
+
+    // Parse the JSON manually
+    let data;
+    try {
+      data = JSON.parse(rawBody);
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return new NextResponse(
+        JSON.stringify({ error: 'Invalid request format' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Log the parsed data
+    console.log('Parsed form data:', data);
     
     // Basic validation
     if (!data.firstName || !data.lastName || !data.email || !data.message) {
-      console.log('Missing required fields');
+      const missingFields = [];
+      if (!data.firstName) missingFields.push('firstName');
+      if (!data.lastName) missingFields.push('lastName');
+      if (!data.email) missingFields.push('email');
+      if (!data.message) missingFields.push('message');
+      
+      console.log('Missing required fields:', missingFields);
       return new NextResponse(
-        JSON.stringify({ error: 'Missing required fields' }),
+        JSON.stringify({ 
+          error: 'Missing required fields', 
+          missingFields 
+        }),
         { 
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -33,10 +59,17 @@ export async function POST(req: Request) {
       message: data.message,
       timestamp: new Date().toISOString()
     };
-    console.log('Formatted inquiry details:', inquiryDetails);
 
-    // Check if we have the Resend API key
+    // Check environment variables
     const resendApiKey = process.env.RESEND_API_KEY;
+    const adminEmail = process.env.ADMIN_EMAIL;
+
+    console.log('Environment check:', {
+      hasResendKey: !!resendApiKey,
+      hasAdminEmail: !!adminEmail,
+      adminEmail: adminEmail // Log the actual email for verification
+    });
+
     if (!resendApiKey) {
       console.error('Resend API key is not configured');
       return new NextResponse(
@@ -48,8 +81,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if we have the admin email
-    const adminEmail = process.env.ADMIN_EMAIL;
     if (!adminEmail) {
       console.error('Admin email is not configured');
       return new NextResponse(
@@ -61,13 +92,13 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log('Initializing Resend with API key');
-    // Initialize Resend with the API key
+    // Initialize Resend
     const resend = new Resend(resendApiKey);
 
-    console.log('Attempting to send email to:', adminEmail);
     try {
-      // Send email to admin
+      console.log('Attempting to send email with Resend...');
+      
+      // Send email
       const { data: emailResponse, error } = await resend.emails.send({
         from: 'Flowgent <onboarding@resend.dev>',
         to: adminEmail,
@@ -85,10 +116,15 @@ export async function POST(req: Request) {
         `
       });
 
+      console.log('Resend response:', { emailResponse, error });
+
       if (error) {
-        console.error('Failed to send email:', error);
+        console.error('Resend error:', error);
         return new NextResponse(
-          JSON.stringify({ error: `Failed to send inquiry email: ${error.message}` }),
+          JSON.stringify({ 
+            error: `Failed to send inquiry email: ${error.message}`,
+            details: error
+          }),
           { 
             status: 500,
             headers: { 'Content-Type': 'application/json' }
@@ -100,7 +136,8 @@ export async function POST(req: Request) {
       return new NextResponse(
         JSON.stringify({ 
           success: true,
-          message: 'Inquiry received successfully'
+          message: 'Inquiry received successfully',
+          emailId: emailResponse?.id
         }),
         { 
           status: 200,
@@ -108,10 +145,11 @@ export async function POST(req: Request) {
         }
       );
     } catch (emailError) {
-      console.error('Error sending email:', emailError);
+      console.error('Error in Resend operation:', emailError);
       return new NextResponse(
         JSON.stringify({ 
-          error: emailError instanceof Error ? emailError.message : 'Failed to send email'
+          error: 'Failed to send email',
+          details: emailError instanceof Error ? emailError.message : String(emailError)
         }),
         { 
           status: 500,
@@ -120,10 +158,11 @@ export async function POST(req: Request) {
       );
     }
   } catch (error) {
-    console.error('Contact form error:', error);
+    console.error('Unhandled error in contact form API:', error);
     return new NextResponse(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Failed to process inquiry'
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : String(error)
       }),
       { 
         status: 500,

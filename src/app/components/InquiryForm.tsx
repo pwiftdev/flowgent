@@ -39,30 +39,38 @@ export default function InquiryForm() {
     setErrorMessage('');
     
     try {
+      // Log the request
       console.log('Submitting form data:', formData);
       
+      // Make the request
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
 
+      // Log the raw response
+      const rawResponse = await response.text();
+      console.log('Raw API response:', rawResponse);
+
+      // Try to parse the response
       let data;
       try {
-        const textResponse = await response.text();
-        console.log('Raw response:', textResponse);
-        data = JSON.parse(textResponse);
+        data = JSON.parse(rawResponse);
+        console.log('Parsed API response:', data);
       } catch (parseError) {
-        console.error('Failed to parse response:', parseError);
-        throw new Error('Invalid response from server');
+        console.error('Failed to parse API response:', parseError);
+        throw new Error('The server returned an invalid response. Please try again.');
       }
 
-      console.log('Response data:', data);
-
+      // Handle the response
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
+        const errorMessage = data.error || 'Failed to send message';
+        console.error('API error:', data);
+        throw new Error(errorMessage);
       }
       
+      // Success case
       setStatus('success');
       setFormData({
         firstName: '',
@@ -74,9 +82,16 @@ export default function InquiryForm() {
         message: ''
       });
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error('Form submission error:', {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
       setStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to send message. Please try again.');
+      setErrorMessage(
+        error instanceof Error 
+          ? error.message 
+          : 'An unexpected error occurred. Please try again.'
+      );
     }
   };
 
