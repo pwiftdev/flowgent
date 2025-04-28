@@ -39,38 +39,18 @@ export default function InquiryForm() {
     setErrorMessage('');
     
     try {
-      // Log the request
-      console.log('Submitting form data:', formData);
-      
-      // Make the request
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
 
-      // Log the raw response
-      const rawResponse = await response.text();
-      console.log('Raw API response:', rawResponse);
+      const data = await response.json();
 
-      // Try to parse the response
-      let data;
-      try {
-        data = JSON.parse(rawResponse);
-        console.log('Parsed API response:', data);
-      } catch (parseError) {
-        console.error('Failed to parse API response:', parseError);
-        throw new Error('The server returned an invalid response. Please try again.');
-      }
-
-      // Handle the response
       if (!response.ok) {
-        const errorMessage = data.error || 'Failed to send message';
-        console.error('API error:', data);
-        throw new Error(errorMessage);
+        throw new Error(data.error || 'Failed to send message');
       }
       
-      // Success case
       setStatus('success');
       setFormData({
         firstName: '',
@@ -82,10 +62,7 @@ export default function InquiryForm() {
         message: ''
       });
     } catch (error) {
-      console.error('Form submission error:', {
-        error,
-        message: error instanceof Error ? error.message : 'Unknown error'
-      });
+      console.error('Form submission error:', error);
       setStatus('error');
       setErrorMessage(
         error instanceof Error 
